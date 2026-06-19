@@ -208,15 +208,24 @@ def infer_default_output_name(uploaded_name: str) -> str:
 # ============================================================
 
 def hide_all_except(wb, sheet_name: str):
-    """
-    Deja visible solo la hoja elegida.
-    LibreOffice exporta hojas visibles, por eso ocultamos el resto.
-    """
+    ws_target = wb[sheet_name]
+
+    for ws in wb.worksheets:
+        ws.sheet_state = "visible"
+        ws.sheet_view.tabSelected = False
+
+    idx = wb.worksheets.index(ws_target)
+
+    if idx != 0:
+        wb._sheets.pop(idx)
+        wb._sheets.insert(0, ws_target)
+
     for ws in wb.worksheets:
         ws.sheet_state = "visible" if ws.title == sheet_name else "hidden"
-    wb.active = wb.sheetnames.index(sheet_name)
+        ws.sheet_view.tabSelected = ws.title == sheet_name
 
-
+    wb.active = 0
+    
 def prepare_single_area_workbook(
     original_xlsx: str,
     output_xlsx: str,
@@ -234,6 +243,8 @@ def prepare_single_area_workbook(
 
     ws.print_area = area
     ws.sheet_properties.pageSetUpPr.fitToPage = True
+    ws.print_options.horizontalCentered = True
+    ws.print_options.verticalCentered = True
     ws.page_setup.fitToWidth = 1
     ws.page_setup.fitToHeight = 1
     ws.page_setup.paperSize = ws.PAPERSIZE_A4
@@ -323,6 +334,7 @@ def add_image_page(doc: Document, png_path: str, orientation: str, first: bool):
     p = doc.add_paragraph()
     p.paragraph_format.space_before = 0
     p.paragraph_format.space_after = 0
+    p.alignment = 1
 
     run = p.add_run()
     pic = run.add_picture(png_path, width=usable_width)
