@@ -129,12 +129,12 @@ def range_size_score(ws, area: str) -> tuple[float, float]:
     for c in range(min_col, max_col + 1):
         letter = ws.cell(1, c).column_letter
         dim = ws.column_dimensions.get(letter)
-        width += float(dim.width or 8.43)
+        width += float((dim.width if dim is not None and dim.width is not None else 8.43))
 
     height = 0.0
     for r in range(min_row, max_row + 1):
         dim = ws.row_dimensions.get(r)
-        height += float(dim.height or 15)
+        height += float((dim.height if dim is not None and dim.height is not None else 15))
 
     return width, height
 
@@ -518,3 +518,4 @@ else:
         "Prepará el Excel definiendo un área de impresión para la carátula "
         "y varias áreas de impresión en la hoja del balance."
     )
+
