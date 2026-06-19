@@ -129,12 +129,18 @@ def range_size_score(ws, area: str) -> tuple[float, float]:
     for c in range(min_col, max_col + 1):
         letter = ws.cell(1, c).column_letter
         dim = ws.column_dimensions.get(letter)
-        width += float((dim.width if dim is not None and dim.width is not None else 8.43))
+        if dim is None or dim.width is None:
+            width += 8.43
+        else:
+            width += float(dim.width)
 
     height = 0.0
     for r in range(min_row, max_row + 1):
         dim = ws.row_dimensions.get(r)
-        height += float((dim.height if dim is not None and dim.height is not None else 15))
+        if dim is None or dim.height is None:
+            height += 15
+        else:
+            height += float(dim.height)
 
     return width, height
 
